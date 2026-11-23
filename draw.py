@@ -27,6 +27,10 @@ Edition of 23 Nov 2026, Reuters wires and the day's news digests):
 
 Everything is drawn with PIL shapes and real fonts, so every word stays
 crisp - no generated raster text anywhere. Output: entry.png, 1024x1024.
+
+Layout revision (2026-11-23): panel type enlarged and each panel set in
+a ruled cell, and the lead illustration given a lit horizon, a wake and
+a navigation light - all so the page stays legible at thumbnail size.
 """
 
 from PIL import Image, ImageDraw, ImageFont
@@ -92,11 +96,15 @@ d.rectangle([M, LY, M + 296, LY + 196], fill=(16, 26, 44))
 d.ellipse([M + 226, LY + 18, M + 268, LY + 60], fill=(238, 230, 200))  # moon
 for sx, sy in [(30, 30), (90, 64), (180, 96), (52, 120), (250, 130)]:
     d.ellipse([M + sx, LY + sy, M + sx + 5, LY + sy + 5], fill=(210, 216, 230))
-# sea
+# lit horizon band, then the sea
+d.rectangle([M, LY + 124, M + 296, LY + 140], fill=(33, 52, 82))
 d.rectangle([M, LY + 140, M + 296, LY + 196], fill=(24, 52, 84))
+# wake trailing behind the hull
+d.polygon([(M + 58, LY + 166), (M + 8, LY + 181), (M + 64, LY + 181)], fill=(58, 88, 128))
 # tanker hull + bridge + containers
 d.polygon([(M + 40, LY + 150), (M + 250, LY + 150), (M + 232, LY + 168), (M + 58, LY + 168)], fill=(12, 14, 18))
 d.rectangle([M + 196, LY + 128, M + 226, LY + 150], fill=(12, 14, 18))
+d.ellipse([M + 208, LY + 120, M + 215, LY + 127], fill=(255, 70, 50))  # navigation light
 for i, c in enumerate([(179, 52, 31), (201, 147, 43), (70, 110, 160)]):
     d.rectangle([M + 62 + i * 42, LY + 132, M + 98 + i * 42, LY + 150], fill=c)
 # missile trails
@@ -144,19 +152,21 @@ panels = [
 ]
 
 GX, GY = M, 462
-CW, CH = (W - 2 * M - 20) // 2, 148
+CW, CH = (W - 2 * M - 20) // 2, 150
 for i, (kicker, kc, head, sub) in enumerate(panels):
     x = GX + (i % 2) * (CW + 20)
-    y = GY + (i // 2) * (CH + 12)
+    y = GY + (i // 2) * (CH + 9)
+    # ruled cell: top and bottom rules make the grid read as columns
     d.line([(x, y), (x + CW, y)], fill=PANEL_LINE, width=2)
-    d.text((x + 2, y + 10), kicker, font=font(SANS_B, 16), fill=kc)
+    d.line([(x, y + CH - 2), (x + CW, y + CH - 2)], fill=PANEL_LINE, width=2)
+    d.text((x + 2, y + 9), kicker, font=font(SANS_B, 17), fill=kc)
     hy = y + 36
-    for line in wrap(head, font(SANS_B, 24), CW - 4):
-        d.text((x + 2, hy), line, font=font(SANS_B, 24), fill=INK)
+    for line in wrap(head, font(SANS_B, 25), CW - 4):
+        d.text((x + 2, hy), line, font=font(SANS_B, 25), fill=INK)
         hy += 30
-    for line in wrap(sub, font(SANS, 17), CW - 4):
-        d.text((x + 2, hy + 2), line, font=font(SANS, 17), fill=(52, 56, 62))
-        hy += 23
+    for line in wrap(sub, font(SANS, 18), CW - 4):
+        d.text((x + 2, hy + 2), line, font=font(SANS, 18), fill=(52, 56, 62))
+        hy += 24
 
 # ---------------------------------------------------------------- bottom strip
 BY = 940
